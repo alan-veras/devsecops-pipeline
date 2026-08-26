@@ -1,0 +1,79 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Gate 1/7 - secret scanning (gitleaks)
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: app/requirements*.txt
+
+      - name: Install pinned scanners
+        run: pip install semgrep==1.174.0 checkov==3.3.13
+
+      - name: Gate 2/7 - static analysis (semgrep)
+        run: semgrep scan --config p/python --config p/sql-injection --config p/default --error app/
+
+      - name: Gate 3/7 - IaC misconfiguration (checkov)
+        run: checkov -d terraform --compact
+
+      - name: Gate 4/7 - Dockerfile lint (hadolint)
+        run: |
+          curl -sfL https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64 -o hadolint
+          echo "c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507  hadolint" | sha256sum -c -
+          chmod +x hadolint
+          ./hadolint app/Dockerfile
+
+      - name: Gate 5/7 - image build, no push (docker)
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: app
+          push: false
+          load: true
+          tags: devsecops-pipeline:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Gate 6/7 - vulnerability scan (trivy)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: devsecops-pipeline:ci
+          exit-code: "1"
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Install test dependencies
+        run: pip install -r app/requirements-dev.txt
+
+      - name: Gate 7/7 - smoke tests (pytest)
+        working-directory: app
+        run: pytest tests -q
