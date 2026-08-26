@@ -78,7 +78,7 @@ TAREFAS:
    da seção 3. Tom informal real, parágrafos curtos, SEM link no corpo, terminando em pergunta.
    Gere também o texto do PRIMEIRO COMENTÁRIO (link + como ver os PRs bloqueados + teaser).
 3. Audite cada variante claim a claim contra a seção 2. Marque OK/NOK por claim.
-4. Recomende a vencedora; salve tudo em docs/post-draft.md com o checklist §5 marcado.
+4. Recomende a vencedora; salve as variantes em ../posts/devsecops-pipeline/draft-a.md, draft-b.md e draft-c.md (corpo do post, separador ---, primeiro comentário) e marque o checklist §5 na recomendada.
 5. Sugira 2 melhorias concretas na vencedora.
 
 REGRAS: nada fora da matéria-prima §2; zero buzzword; link SOMENTE no primeiro comentário;
@@ -90,8 +90,8 @@ nunca inventar pessoa/diálogo real no bloco 1. NÃO publique nada, só gerar ar
 Rodar numa sessão nova depois do rascunho pronto. Não edita nada, só julga.
 
 ```
-CONTEXTO: análise ADVERSARIAL do rascunho em docs/post-draft.md do repo devsecops-pipeline.
-Leia o rascunho, README(.pt-BR).md, docs/attacks.md e docs/POST-PLAN.md.
+CONTEXTO: análise ADVERSARIAL do rascunho nas variantes ../posts/devsecops-pipeline/draft-a.md, draft-b.md e draft-c.md do repo devsecops-pipeline.
+Leia as variantes, README(.pt-BR).md, docs/attacks.md e docs/POST-PLAN.md.
 Você é revisor hostil triplo: usuário cético de LinkedIn, DevSecOps sênior alérgico a hype,
 hiring manager técnico de 45 segundos. NÃO edite nada.
 
