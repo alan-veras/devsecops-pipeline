@@ -1,8 +1,8 @@
-# PLANO DE EXECUÇÃO DETALHADO — `devsecops-pipeline`
+# PLANO DE EXECUÇÃO DETALHADO, `devsecops-pipeline`
 
 > Complemento operacional de [PLAN.md](PLAN.md): transforma as fases estratégicas em
 > sessões executáveis, cada uma com um **prompt pronto para colar numa sessão nova do
-> opencode** (toda sessão começa sem memória — os prompts são autocontidos de propósito).
+> opencode** (toda sessão começa sem memória, os prompts são autocontidos de propósito).
 >
 > **Como usar:** uma fase por sessão. Cole o prompt → revise o aceite com o agente →
 > marque a fase no roadmap do README e no §7 do PLAN.md → só então siga.
@@ -17,7 +17,7 @@ Aplica a todas as fases; auditado na Fase 4 e na análise adversarial:
 
 - [ ] Tabela-âncora do README com resultados REAIS e links clicáveis para os runs/PRs
 - [ ] Quickstart copiável que impressiona em ≤30s (`git clone` → algo visível)
-- [ ] Seção "honest scope" (o que este repo NÃO cobre) — franqueza é diferencial
+- [ ] Seção "honest scope" (o que este repo NÃO cobre), franqueza é diferencial
 - [ ] README EN + espelho PT-BR fiel
 - [ ] Badges: CI, nº de ataques bloqueados, license
 - [ ] Rascunho do post LinkedIn com gancho forte, zero buzzword vazio
@@ -25,7 +25,7 @@ Aplica a todas as fases; auditado na Fase 4 e na análise adversarial:
 
 ---
 
-## Fase 0 — Conta AWS segura
+## Fase 0, Conta AWS segura
 
 | | |
 |---|---|
@@ -53,7 +53,7 @@ REGRAS: nunca me peça para colar segredos no chat; quando envolver secret, diga
 para eu colar no PLAN.md e confirme: "Fase 0 OK, pode prosseguir".
 ```
 
-## Fase 1 — Bootstrap do repo + Scaffold + CI verde
+## Fase 1, Bootstrap do repo + Scaffold + CI verde
 
 | | |
 |---|---|
@@ -87,7 +87,7 @@ ACEITE: CI verde no GitHub Actions (me mostre o link do run). Commits em convent
 NÃO avance para os ataques nesta sessão.
 ```
 
-## Fase 2 — As 6 branches de ataque
+## Fase 2, As 6 branches de ataque
 
 | | |
 |---|---|
@@ -97,12 +97,12 @@ NÃO avance para os ataques nesta sessão.
 | Aceite | Cada PR falhou NO GATE CERTO (não noutro); controle verde; nenhum merge em main |
 | Tempo | 1 sessão |
 
-**Por que isso converte:** o produto do repo não é o app — são os PRs vermelhos. O histórico
+**Por que isso converte:** o produto do repo não é o app, são os PRs vermelhos. O histórico
 do git É a prova; recrutador técnico clica no PR e vê o gate matando o ataque.
 
 ```
 CONTEXTO: repo devsecops-pipeline, Fase 2. Leia docs/PLAN.md §4 (matriz de ataques) e §1
-(tabela-âncora). O CI da Fase 1 já está verde. O produto desta fase SÃO OS PRs VERMELHOS —
+(tabela-âncora). O CI da Fase 1 já está verde. O produto desta fase SÃO OS PRs VERMELHOS, 
 o histórico do git é a prova. Nada simulado.
 
 PARA CADA ataque da matriz §4 (hardcoded-key, vuln-dep, open-sg, sqli, root-docker):
@@ -114,12 +114,12 @@ PARA CADA ataque da matriz §4 (hardcoded-key, vuln-dep, open-sg, sqli, root-doc
 4. Espere o CI rodar, CONFIRME que falhou no gate certo (não noutro), capture o número/link
    do run. Se o PR ficar verde ou falhar no gate errado, corrija o payload ou o workflow
    até o bloqueio ser cirúrgico.
-5. NÃO faça merge. Preserve o PR aberto ou fechado como "blocked" — é evidência.
+5. NÃO faça merge. Preserve o PR aberto ou fechado como "blocked", é evidência.
 
 DEPOIS, o grupo de controle:
 6. Crie a branch demo/no-defenses: edite ci.yml desativando todos os gates (jobs comentados
    com "# CONTROL GROUP: defenses off") e plante TODOS os payloads juntos (chave fake +
-   dep CVE + SQLi + Dockerfile root). O CI deve ficar 100% VERDE — essa é a linha 6 da
+   dep CVE + SQLi + Dockerfile root). O CI deve ficar 100% VERDE, essa é a linha 6 da
    tabela-âncora ("defenses OFF → all pass").
 
 FINALIZAÇÃO:
@@ -130,7 +130,7 @@ ACEITE: 5 PRs vermelhos no gate CERTO + 1 controle verde; docs/attacks.md com os
 reais; nenhuma branch attack/* mergeada em main. Me mostre a tabela final antes do commit.
 ```
 
-## Fase 3 — Infra Terraform + OIDC + deploy real
+## Fase 3, Infra Terraform + OIDC + deploy real
 
 | | |
 |---|---|
@@ -138,20 +138,20 @@ reais; nenhuma branch attack/* mergeada em main. Me mostre a tabela final antes 
 | Pré-condição | **Dura:** Fase 0 concluída |
 | Entrega | Módulos TF, backend remoto S3+lock, OIDC role, deploy.yml com approval, deploy real + destroy |
 | Aceite | curl /health da AWS; checkov verde sobre terraform/; destroy deixa conta em R$0 |
-| Tempo | 1–2 sessões |
+| Tempo | 1-2 sessões |
 
 ```
 CONTEXTO: repo devsecops-pipeline, Fase 3. Leia docs/PLAN.md §5 (workflows), §6 (infra) e §9
-(riscos). Fases 0–2 concluídas: conta AWS segura, CI verde, 6 PRs de ataque documentados.
+(riscos). Fases 0-2 concluídas: conta AWS segura, CI verde, 6 PRs de ataque documentados.
 
 TAREFAS EM ORDEM:
 0. Verifique pré-reqs §8: terraform, awscli v2, tflint, gh auth, environment "production"
    criado no GitHub com required reviewer. Instale/guie o que faltar ANTES de seguir.
 1. scripts/bootstrap-state.sh: bucket S3 versionado + DynamoDB lock (roda uma vez via CLI,
-   fora do TF — dogfooding: o backend do TF nunca se gerencia por si mesmo).
+   fora do TF, dogfooding: o backend do TF nunca se gerencia por si mesmo).
 2. OIDC primeiro (~15 min, chato mas é a narrativa): guie criação do OIDC provider + role IAM
    com trust policy do repo, permissão mínima viável. SEM chaves estáticas em nenhum segredo.
-3. Módulos terraform/: network (VPC, 2 subnets, SG com 22 restrito AO MEU IP — pergunte antes),
+3. Módulos terraform/: network (VPC, 2 subnets, SG com 22 restrito AO MEU IP, pergunte antes),
    registry (ECR scan-on-push ON + tag immutability ON), compute (Launch Template t4g.micro +
    user-data: docker pull ECR → run na 8080). envs/dev amarra tudo; state remoto S3+lock.
 4. checkov TEM que passar limpo sobre terraform/ (é gate do CI da Fase 1).
@@ -166,18 +166,18 @@ R$0 (mostre o console/budget); checkov verde. Se qualquer passo ameaçar sair do
 e me consulte com estimativa antes de aplicar.
 ```
 
-## Fase 4 — Docs & Post
+## Fase 4, Docs & Post
 
 | | |
 |---|---|
 | Objetivo | Repo pinável + rascunho do post LinkedIn |
-| Pré-condição | Fases 0–3 |
+| Pré-condição | Fases 0-3 |
 | Entrega | architecture.md, threat-model.md, attacks.md final, READMEs EN/PT-BR polidos, post |
 | Aceite | Checklist §2 do PLAN.md 100%; números do README auditáveis nos links |
 | Tempo | 1 sessão |
 
 ```
-CONTEXTO: repo devsecops-pipeline, Fase 4 final. Leia PLAN.md §1–§2, docs/attacks.md (links reais
+CONTEXTO: repo devsecops-pipeline, Fase 4 final. Leia PLAN.md §1-§2, docs/attacks.md (links reais
 da Fase 2) e o histórico do repo.
 
 TAREFAS:
@@ -187,7 +187,7 @@ TAREFAS:
 3. README.md EN polido para conversão: tabela-âncora com resultado REAL de cada ataque (links dos
    PRs vermelhos clicáveis), quickstart copiável ≤30s, badges (CI, attacks count), seção "honest
    scope" (o que NÃO cobre), stack list. README.pt-BR.md espelho fiel.
-4. Rascunho post LinkedIn pt-BR: seguir **[docs/POST-PLAN.md](POST-PLAN.md)** — anatomia de
+4. Rascunho post LinkedIn pt-BR: seguir **[docs/POST-PLAN.md](POST-PLAN.md)**, anatomia de
    7 blocos ([../../POST-STYLE.md](../../POST-STYLE.md)), matéria-prima auditável da seção 2,
    prompt pronto na seção 6 e análise adversarial do post na seção 7. Só gerar rascunho quando
    todas as fontes da seção 2 existirem (PRs vermelhos, controle verde, deploy real).
@@ -199,9 +199,9 @@ de melhoria de hook se houver.
 
 ---
 
-## 🔴 Análise adversarial — rodar ao final de TODAS as fases
+## 🔴 Análise adversarial, rodar ao final de TODAS as fases
 
-Cole este prompt numa sessão nova quando o repo estiver completo. Ele NÃO corrige nada —
+Cole este prompt numa sessão nova quando o repo estiver completo. Ele NÃO corrige nada, 
 produz o relatório que decide se o repo está pronto para virar post + ser pinado.
 
 ```
@@ -209,12 +209,12 @@ CONTEXTO: análise ADVERSARIAL do repo devsecops-pipeline. Leia README(.pt-BR).m
 .github/workflows/, app/, terraform/ e inspecione as branches attack/* (gh pr list --state all).
 Você é TRÊS revisores hostis num só: engenheiro DevSecOps sênior, auditor de segurança, hiring
 manager impaciente. Objetivo: achar TODO ponto onde o repo falha como prova de competência ou
-peça de conversão. NÃO corrija nada — só analise.
+peça de conversão. NÃO corrija nada, só analise.
 
 EIXOS DE ATAQUE:
 1. VERACIDADE: algum claim sem evidência real? Os 6 PRs existem e cada um falhou NO GATE CERTO
    (abra os runs)? O controle no-defenses está documentado? Números do README são auditáveis?
-2. REPRODUTIBILIDADE: clonei — funciona do zero? Versões/pins corretos (actions por SHA)?
+2. REPRODUTIBILIDADE: clonei, funciona do zero? Versões/pins corretos (actions por SHA)?
    Algum IP privado, ARN real ou segredo vazou em logs/tfstate/docs?
 3. SEGURANÇA DO PRÓPRIO REPO: branches attack/* têm branch protection (merge acidental deixaria
    main vulnerável)? tfstate com dados sensíveis parou onde? O deploy.yml tem superfície de
@@ -222,14 +222,14 @@ EIXOS DE ATAQUE:
 4. PROFUNDIDADE TÉCNICA: o que um sênior apontaria como amador? Faltam SBOM/cosign/scorecards?
    Módulos TF mal fatiados? Gates com ordem errada (fail fast)?
 5. FRANQUEZA: a seção "honest scope" admite o que não cobre, ou finge completude?
-6. CONVERSÃO: 45 segundos de atenção — o valor fica óbvio? Quickstart funciona? O post teria
+6. CONVERSÃO: 45 segundos de atenção, o valor fica óbvio? Quickstart funciona? O post teria
    engagement real ou é cringe/clickbait?
 
-SAÍDA OBRIGATÓRIA: relatório markdown — cada achado com severidade (P1 = bloqueia publicação /
+SAÍDA OBRIGATÓRIA: relatório markdown, cada achado com severidade (P1 = bloqueia publicação /
 P2 = corrigir antes do post / P3 = nice-to-have), evidência exata (arquivo:linha ou URL) e
 correção concreta de 1 linha. Feche com veredito: "pronto para pinar no perfil: SIM/NÃO" +
 top 3 fixes por impacto. Se um eixo passar limpo, declare explicitamente "eixo X: sem achados"
-— não invente problema.
+(não invente problema).
 ```
 
 ### Fluxo pós-análise

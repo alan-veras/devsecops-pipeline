@@ -1,4 +1,4 @@
-# backend "s3" {} — uncommented by Fase 3 after scripts/bootstrap-state.sh
+# backend "s3" {}: uncommented by Fase 3 after scripts/bootstrap-state.sh
 
 terraform {
   required_version = "~> 1.11"

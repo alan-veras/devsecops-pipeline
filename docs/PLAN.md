@@ -1,15 +1,15 @@
-# PLANO — Repo #1: `devsecops-pipeline`
+# PLANO, Repo #1: `devsecops-pipeline`
 
 > Destino: `/home/alanv/Trabalhos/Portfolio/devsecops-pipeline/`
-> Status atual: **somente planejamento documentado** — nenhuma linha de implementação ainda.
+> Status atual: **somente planejamento documentado**, nenhuma linha de implementação ainda.
 > Decisões confirmadas pelo Alan: AWS real · EC2 + Docker · app-cobaia com gancho de cyber · EN + PT-BR · este é o repo prioritário.
 > Execução fase a fase com prompts prontos: **[EXECUTION-PLAN.md](EXECUTION-PLAN.md)**
 
 ---
 
-## 1. Conceito narrativo — "The Pipeline That Says No"
+## 1. Conceito narrativo, "The Pipeline That Says No"
 
-O produto do repo **não é o app** — são os ataques que o pipeline mata. Um app pequeno de propósito atacável, com 6 ataques plantados, onde cada gate bloqueia um deles, demonstrado via branches/PRs reais ficando vermelhos.
+O produto do repo **não é o app**, são os ataques que o pipeline mata. Um app pequeno de propósito atacável, com 6 ataques plantados, onde cada gate bloqueia um deles, demonstrado via branches/PRs reais ficando vermelhos.
 
 Tabela-âncora do README (mesmo formato dos headlines do llm-redteam-lab):
 
@@ -20,7 +20,7 @@ Tabela-âncora do README (mesmo formato dos headlines do llm-redteam-lab):
 | Security group open to 0.0.0.0/0 | checkov | blocked |
 | SQL injection in handler | semgrep | blocked |
 | Dockerfile as root + `:latest` | hadolint | blocked |
-| Defenses OFF (controle) | — | all pass |
+| Defenses OFF (controle) |(nenhum)| all pass |
 
 Post derivado pronto: *"Eu plantei 6 ataques no meu próprio deploy. Todos morreram antes da produção."*
 
@@ -70,17 +70,17 @@ devsecops-pipeline/
 | 3 | `attack/open-sg` | ingress `0.0.0.0/0` na porta 22 no Terraform | checkov (CKV_AWS_24) | CIDR restrito |
 | 4 | `attack/sqli` | query concatenada em `/items?q=` | semgrep (python SQLi rule) | query parametrizada |
 | 5 | `attack/root-docker` | Dockerfile sem USER + base `:latest` | hadolint (DL3002/DL3006) + trivy config | non-root + digest |
-| 6 | — | branch `demo/no-defenses` com todos gates desativados no CI | nenhum | tabela comparativa |
+| 6 |(nenhum)| branch `demo/no-defenses` com todos gates desativados no CI | nenhum | tabela comparativa |
 
 Regra: nada simulado. Cada ataque é commit real, PR real vermelho, link no `docs/attacks.md`. O histórico do git É a evidência.
 
 ## 5. Especificação dos workflows
 
 ### ci.yml (todo push/PR)
-1. `gitleaks/gitleaks-action@v2` — secret scanning
-2. `semgrep` — `p/python`, `p/sql-injection`, `p/default`
-3. `checkov` — scan do diretório `terraform/`
-4. `hadolint` — lint do(s) Dockerfile(s)
+1. `gitleaks/gitleaks-action@v2`, secret scanning
+2. `semgrep`, `p/python`, `p/sql-injection`, `p/default`
+3. `checkov`, scan do diretório `terraform/`
+4. `hadolint`, lint do(s) Dockerfile(s)
 5. build da imagem docker (sem push)
 6. `trivy image --exit-code 1 --severity CRITICAL,HIGH`
 7. pytest smoke
@@ -107,10 +107,10 @@ Custo estimado fora do free tier: < R$5/mês; após destroy: R$0.
 | **0. Conta AWS segura** | conta nova com MFA, usuário IAM admin (root guardado), budget alarm | login OK + alarme ativo | checklist guiado ~30 min |
 | **1. Scaffold + Gates** | estrutura completa, app, Dockerfile, ci.yml verde | CI verde no GitHub | 1 sessão |
 | **2. Ataques** | 6 branches attack/* com PRs vermelhos documentados | matriz §4 completa | 1 sessão |
-| **3. Infra** | módulos TF + bootstrap + deploy.yml OIDC + deploy real | /health responde da AWS | 1–2 sessões |
+| **3. Infra** | módulos TF + bootstrap + deploy.yml OIDC + deploy real | /health responde da AWS | 1-2 sessões |
 | **4. Docs & Post** | READMEs EN/PT-BR, architecture.md, attacks.md, threat-model.md, rascunho post | repo pinado no perfil | 1 sessão |
 
-Dependência dura: Fase 3 só começa após Fase 0 concluída. Fases 1–2 não precisam de cloud.
+Dependência dura: Fase 3 só começa após Fase 0 concluída. Fases 1-2 não precisam de cloud.
 
 ## 8. Checklist pré-requisitos locais (Fase 0 paralela)
 
@@ -122,7 +122,7 @@ Dependência dura: Fase 3 só começa após Fase 0 concluída. Fases 1–2 não 
 ## 9. Riscos / notas
 
 - Free tier exige cartão na criação da conta → Fase 0 inclui alarme antes de qualquer recurso
-- OIDC tem setup inicial chato (~15 min) mas elimina segredos estáticos — vale a narrativa
+- OIDC tem setup inicial chato (~15 min) mas elimina segredos estáticos, vale a narrativa
 - Portas expostas: manter apenas 8080 público; SSH restrito ao IP doméstico (ou SSM Session Manager como stretch)
 - O app é propositalmente vulnerável APENAS em branches attack/*; main sempre limpa
 
